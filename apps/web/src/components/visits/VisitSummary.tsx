@@ -42,7 +42,7 @@ export function VisitSummary({ visit }: VisitSummaryProps) {
             Transcrição
           </p>
           <p className="text-sm leading-relaxed text-foreground/90 italic">
-            "{visit.transcriptRaw}"
+            &ldquo;{visit.transcriptRaw}&rdquo;
           </p>
         </div>
       )}

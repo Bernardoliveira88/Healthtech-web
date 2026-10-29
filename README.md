@@ -413,3 +413,78 @@ Este checklist deve ser atualizado conforme as features forem finalizadas.
 1.  **Padronização:** Mover as pastas da `apps/web` para dentro de `src/` e atualizar os imports.
 2.  **Fluxo de Áudio:** Integrar o envio do blob de áudio logo após o stop da gravação.
 3.  **Estado Global:** Utilizar o `authStore` para qualquer verificação de permissão no frontend.
+
+---
+
+## Como Rodar (Local e Vercel)
+
+O repositório **não tem `package.json` na raiz**: cada app (`apps/web` e `apps/pwa`) é um projeto Next.js independente, com seu próprio `node_modules` e `package-lock.json`. Todos os comandos devem ser executados **dentro da pasta do app**.
+
+> ⚠️ Não rode `npx next ...` na raiz nem em uma pasta sem `npm install` feito: o `npx` baixa a última versão do Next (16+), que é incompatível com este projeto (Next 14).
+
+**Requisitos:** Node.js 18.17+ (recomendado 20 LTS ou superior) e npm.
+
+### Localhost (terminal do VS Code)
+
+App web (painel) — http://localhost:3000
+
+```bash
+cd apps/web
+npm ci
+cp .env.example .env.local   # PowerShell: Copy-Item .env.example .env.local
+npm run dev
+```
+
+App PWA (mobile/familiar) — em outro terminal, na porta 3002 para não conflitar com o web:
+
+```bash
+cd apps/pwa
+npm ci
+cp .env.example .env.local
+npm run dev -- -p 3002
+```
+
+Edite os `.env.local` apontando `NEXT_PUBLIC_API_URL` para o backend (padrão `http://localhost:3001`).
+
+Testar o build de produção localmente (igual ao que a Vercel executa):
+
+```bash
+npm run build
+npm start          # PWA: npm start -- -p 3002
+```
+
+> No PWA, `npm run build` sobrescreve `public/sw.js` com o service worker gerado pelo next-pwa. Antes de commitar, restaure a versão de dev: `git checkout -- public/sw.js`.
+
+Outros comandos: `npm run lint`, `npm test`.
+
+### Vercel
+
+Crie **um projeto Vercel para cada app**, importando o mesmo repositório:
+
+| Configuração | Web | PWA |
+|---|---|---|
+| Root Directory | `apps/web` | `apps/pwa` |
+| Framework Preset | Next.js | Next.js |
+| Build / Install Command | padrão (`npm run build` / `npm install`) | padrão |
+| Node.js Version | 20.x ou superior | 20.x ou superior |
+
+O **Root Directory é obrigatório** — sem ele a Vercel procura o Next.js na raiz e o deploy falha com "No Next.js version detected".
+
+Variáveis de ambiente (Settings → Environment Variables). São embutidas no build, então **faça redeploy após alterá-las**:
+
+| Variável | Web | PWA |
+|---|---|---|
+| `NEXT_PUBLIC_API_URL` | URL pública do backend (HTTPS, nunca `localhost`) | idem |
+| `NEXT_PUBLIC_APP_NAME` | `RoundLog` | `RoundLog` |
+| `NEXT_PUBLIC_FAMILY_PORTAL_URL` | URL do projeto PWA na Vercel | — |
+
+O backend precisa liberar CORS para os domínios `*.vercel.app` dos dois projetos.
+
+Pela CLI (opcional):
+
+```bash
+npm i -g vercel
+cd apps/web
+vercel            # preview; na primeira vez vincula o projeto
+vercel --prod     # produção
+```

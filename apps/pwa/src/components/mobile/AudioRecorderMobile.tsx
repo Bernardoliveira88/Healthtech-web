@@ -3,7 +3,6 @@
 import { useAudioRecorder } from "@/lib/hooks/useAudioRecorder";
 import { Button } from "@/components/ui/button";
 import { Mic, Square, RotateCcw, Upload, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface AudioRecorderMobileProps {
   onUpload: (blob: Blob) => void;
