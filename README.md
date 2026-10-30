@@ -418,7 +418,18 @@ Este checklist deve ser atualizado conforme as features forem finalizadas.
 
 ## Como Rodar (Local e Vercel)
 
-O repositório **não tem `package.json` na raiz**: cada app (`apps/web` e `apps/pwa`) é um projeto Next.js independente, com seu próprio `node_modules` e `package-lock.json`. Todos os comandos devem ser executados **dentro da pasta do app**.
+Cada app (`apps/web` e `apps/pwa`) é um projeto Next.js independente, com seu próprio `node_modules` e `package-lock.json`. O `package.json` da raiz só tem atalhos que chamam os apps:
+
+| Na raiz | Faz |
+|---|---|
+| `npm run setup` | `npm ci` nos dois apps (primeira vez) |
+| `npm run dev` / `npm run dev:web` | Web em http://localhost:3000 |
+| `npm run dev:pwa` | PWA em http://localhost:3002 (rode em outro terminal) |
+| `npm run build` / `build:web` / `build:pwa` | Build de produção |
+| `npm run start:web` / `start:pwa` | Servir o build de produção |
+| `npm run lint` / `npm test` | Lint e testes dos dois apps |
+
+Os comandos abaixo, dentro de cada pasta, continuam valendo.
 
 > ⚠️ Não rode `npx next ...` na raiz nem em uma pasta sem `npm install` feito: o `npx` baixa a última versão do Next (16+), que é incompatível com este projeto (Next 14).
 
