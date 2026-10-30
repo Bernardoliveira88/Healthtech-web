@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { login } from "@/lib/api/auth";
+import { ApiError } from "@/lib/api/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,11 +36,18 @@ export default function LoginPage() {
       setAuth(response.user, response.token);
       router.push("/dashboard");
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? "E-mail ou senha inválidos."
-          : "Erro inesperado. Tente novamente."
-      );
+      // Só 400/401 indicam credencial errada; erro de rede = API fora do ar.
+      if (err instanceof ApiError) {
+        setError(
+          err.status === 400 || err.status === 401
+            ? "E-mail ou senha inválidos."
+            : `Erro no servidor (${err.status}). Tente novamente.`
+        );
+      } else {
+        setError(
+          `Não foi possível conectar à API (${process.env.NEXT_PUBLIC_API_URL}). Verifique se o backend está rodando.`
+        );
+      }
     } finally {
       setLoading(false);
     }
