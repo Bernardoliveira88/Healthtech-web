@@ -3,6 +3,7 @@ import {
   logoutFromStore,
   setTokenInStore,
 } from "@/lib/stores/authStore";
+import { DemoApiError, demoFetch, isDemoMode } from "./demo";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -66,6 +67,12 @@ function buildHeaders(token: string | null, options?: RequestInit): HeadersInit 
  *  - ApiError com status + body em caso de erro
  */
 export async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  if (isDemoMode) {
+    return demoFetch<T>(path, options).catch((err) => {
+      throw err instanceof DemoApiError ? new ApiError(err.status, err.body) : err;
+    });
+  }
+
   let token = getTokenFromStore();
 
   let res = await fetch(`${API_URL}${path}`, {

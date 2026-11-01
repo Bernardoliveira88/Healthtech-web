@@ -1,10 +1,12 @@
 import type { FamilyUpdate, FamilyMessage } from "@/lib/types";
+import { demoFetch, isDemoMode } from "./demo";
 
 // O portal familiar não usa JWT — chama a API direto com o token na URL.
 // Não pode usar apiFetch (que injeta Bearer e tenta refresh).
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 async function familyFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  if (isDemoMode) return demoFetch<T>(path, options);
   const res = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: {

@@ -1,4 +1,5 @@
 import { apiFetch } from "./client";
+import { isDemoMode } from "./demo";
 import type { AuthResponse, LoginCredentials, RegisterData, User } from "@/lib/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -25,6 +26,7 @@ export const register = (data: RegisterData) =>
  * Idempotente: fetch direto (não passa por apiFetch pra evitar refresh-on-401).
  */
 export const logoutApi = async (): Promise<void> => {
+  if (isDemoMode) return;
   try {
     await fetch(`${API_URL}/auth/logout`, {
       method: "POST",
